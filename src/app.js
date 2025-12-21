@@ -7,16 +7,13 @@ const app = express(); // creating an instance of express.js application
 
 const User = require("./models/user"); // Importing the User model
 
-app.post("/signup", async (req, res) => {
-  const userObj = {
-    firstName: "Virat",
-    lastName: "Kohli",
-    emailId: "virat@gmail.com",
-    password: "virat@123",
-  };
+// Writing like this makes it applicable to all the routes("/"") for application which means for all the requests. We don't need to write it again for parsing anymore.
+app.use(express.json());
 
-  // Creating a new instance of the User model
-  const user = new User(userObj);
+app.post("/signup", async (req, res) => {
+
+  // Dynamically creating a new instance of User model from request 
+  const user = new User(req.body);
 
   // Always wrap in try catch blocks for better error handling
   try {
