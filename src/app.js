@@ -1,15 +1,92 @@
 const express = require("express");
+// const { adminAuthuth, adminAuth } = require("./middleware/auth");
+require("./config/database");
+const connectDB = require("./config/database");
 
 const app = express(); // creating an instance of express.js application
 
-// app.use((req, res) => {
-//     res.send("Hello from the server!")
+const User = require("./models/user"); // Importing the User model
+
+app.post("/signup", async (req, res) => {
+  const userObj = {
+    firstName: "Virat",
+    lastName: "Kohli",
+    emailId: "virat@gmail.com",
+    password: "virat@123",
+  };
+
+  // Creating a new instance of the User model
+  const user = new User(userObj);
+
+  // Always wrap in try catch blocks for better error handling
+  try {
+    await user.save(); // saving data to the database
+    res.send("User added successfully");
+  } catch (err) {
+    res.status(400).send("Error saving the user:" + err.message);
+  }
+});
+
+connectDB()
+  .then(() => {
+    console.log("Database connection successful");
+
+    // listen method accepts a port number and a callback function that executes only when server is running successfully on passed port number
+    // We should connect the database before starting application on a certain port that why we are passing here because when connectDB promise resolve and database is successfully connected then we start application.
+    app.listen(7777, () => {
+      console.log("Server is successfully running on port 7777 ...");
+    });
+  })
+  .catch(err => {
+    console.log("Database connection failed");
+  });
+
+// ====================================================
+
+// app.use("route", RouteHandler function)
+
+// Routehandler function syntax:
+// (err, req, res, next) => {}
+// Order of parameters matter here.
+// If we pass two arguments, first will be req, second will be res.
+// If we pass three arguments, first will be req, second will be res and third will be next.
+// If we pass four arguments, first will be err, second will be req, third will be res and fourth will be next.
+
+// app.get("/user", (req, res) => {
+//     console.log(req.query); // Query parameter /user?shrey
+//     res.send("Shreyansh");
 // })
 
-app.use("/test", (req,res) => {
-    res.send("Testing server!")
-})
+// app.get("/user/:userId/:name/:password", (req, res) => {
+//     console.log(req.params);
+//     res.send("babu")
+// })
 
-app.listen(3000, () => {
-    console.log("Server is successfully running on port 3000 ...");
-}); // listen method accepts a port number and a callback function that executes only when server is running successfully on passed port number
+// app.use("/", (req, res) => {
+//     res.send("Namaste Nodejs");
+// })
+
+// app.use("/hello", (req, res) => {
+//     res.send("Hello From Server")
+// })
+
+// app.use("/test", (req,res) => {
+//     res.send("Testing server!")
+// })
+
+// Order in which routes are used matters: In the above scenario there are 3 routes: "/", "/hello", "/test" but all routes resolve to same response i.e. "Namaste Nodejs". Since that route is used first in the code and all three routes start with same slash.
+
+// The order in which you write routes is very important in Express. Routes are matched top to bottom, and the first match is executed.
+
+// ============Middleware=========
+
+// app.use("/admin", adminAuth);
+
+// app.get("/admin/getAllData", (req, res) => {
+//   try {
+//     console.log("All data fetched");
+//     res.send("ALL DATA");
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
