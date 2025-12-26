@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 // Creating a schema or structure of a collection (fields and their data types)
 const userSchema = mongoose.Schema({
@@ -16,10 +17,20 @@ const userSchema = mongoose.Schema({
         required: true,
         unique: true,
         lowercase: true,
-        trim: true
+        trim: true,
+        validate(value) {
+            if (!validator.isEmail(value)) {
+                throw new Error("Invalid email: "+ value);
+            }
+        }
     },
     password: {
-        type: String
+        type: String,
+        validate(value) {
+            if (!validator.isStrongPassword(value)) {
+                throw new Error("Enter a strong password");
+            }
+        }
     },
     age: {
         type: Number,
@@ -34,7 +45,12 @@ const userSchema = mongoose.Schema({
         }
     },
     photoUrl: {
-        type: String
+        type: String,
+        validate(value) {
+            if (!validator.isURL(value)) {
+                throw new Error("Invalid Photo URL: " + value);
+            }
+        }
     },
     about: {
         type: String,
