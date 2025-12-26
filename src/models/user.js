@@ -3,24 +3,47 @@ const mongoose = require("mongoose");
 // Creating a schema or structure of a collection (fields and their data types)
 const userSchema = mongoose.Schema({
     firstName: {
-        type: String
+        type: String,
+        required: true,
+        minLength: 3,
+        maxLength: 50
     },
     lastName: {
         type: String
     },
     emailId: {
-        type: String
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true
     },
     password: {
         type: String
     },
     age: {
-        type: String
+        type: Number,
+        min: 18
     },
     gender: {
+        type: String,
+        validate: function (value) {
+            if (!["male", "female", "others"].includes(value)) {
+                throw new Error("Invalid Gender!");
+            }
+        }
+    },
+    photoUrl: {
         type: String
+    },
+    about: {
+        type: String,
+        default: "This is default info of the user!"
+    },
+    skills: {
+        type: [String]
     }
-})
+}, {timestamps: true})
 
 // Creating a model (A models name starts with capital letter)
 // Think of a model as a class of which different instances will be there database.
