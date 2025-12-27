@@ -24,12 +24,19 @@ app.post("/signup", async (req, res) => {
     const { password } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
 
+    const { firstName, lastName, emailId, age, gender, about, photoUrl , skills} = req.body;
+
     // Dynamically creating a new instance of User model from request
     const user = new User({
       firstName,
       lastName,
       emailId,
       password: passwordHash,
+      age,
+      gender,
+      photoUrl,
+      about,
+      skills,
     });
 
     // saving data to the database
@@ -37,6 +44,27 @@ app.post("/signup", async (req, res) => {
     res.send("User added successfully");
   } catch (err) {
     res.status(400).send("Error:" + err.message);
+  }
+});
+
+// Login
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+   
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid Credentials");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (isPasswordValid) {
+      res.send("Login Successful");
+    } else {
+      throw new Error("Invalid Credentials");
+    }
+  } catch (error) {
+    res.status(400).send("Error: " + error.message);
   }
 });
 
@@ -111,7 +139,7 @@ app.patch("/user/:userId", async (req, res) => {
     });
     res.send("User updated successfully");
   } catch (error) {
-    res.status(400).send("Something went wrong");
+    res.status(400).send("Error: "+ error.message);
   }
 });
 

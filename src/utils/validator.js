@@ -4,6 +4,8 @@ function validateSignupData(req) {
 
     const { firstName, lastName, emailId, password } = req.body;
 
+    console.log(firstName);
+
     if (!firstName || !lastName) {
         throw new Error("Invalid name")
 
