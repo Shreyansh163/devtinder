@@ -6,13 +6,20 @@ const connectDB = require("./config/database");
 const { validateSignupData } = require("./utils/validator");
 
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 const app = express(); // creating an instance of express.js application
 
 const User = require("./models/user"); // Importing the User model
 
+const { userAuth } = require("./middleware/auth");
+
 // Writing like this makes it applicable to all the routes("/"") for application which means for all the requests. We don't need to write it again for parsing anymore.
 app.use(express.json());
+
+// Enabling cookie parser for all routes using app.use()
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
   // Always wrap in try catch blocks for better error handling
@@ -24,7 +31,16 @@ app.post("/signup", async (req, res) => {
     const { password } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const { firstName, lastName, emailId, age, gender, about, photoUrl , skills} = req.body;
+    const {
+      firstName,
+      lastName,
+      emailId,
+      age,
+      gender,
+      about,
+      photoUrl,
+      skills,
+    } = req.body;
 
     // Dynamically creating a new instance of User model from request
     const user = new User({
@@ -51,18 +67,42 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
-   
+
     const user = await User.findOne({ emailId: emailId });
     if (!user) {
       throw new Error("Invalid Credentials");
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.validatePassword(password);
 
     if (isPasswordValid) {
+      // Create a JWT(JSON Web Token) - Install jsonwebtoken and import then use it here
+      // What is JWT token?
+      // JSON Web Token are an open industry standard method for representing claims securely between two parties.
+      // JWT decoded: Header, Payload and Signature
+      // Install jsonwebtoken package from npm library
+
+      const token = await user.getJWT();
+      console.log(token);
+
+      // Add the token to cookie then send cookie back to user
+
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000)
+      }); // cookie will expire in 8 days
       res.send("Login Successful");
     } else {
       throw new Error("Invalid Credentials");
     }
+  } catch (error) {
+    res.status(400).send("Error: " + error.message);
+  }
+});
+
+// Profile
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    res.send(user);
   } catch (error) {
     res.status(400).send("Error: " + error.message);
   }
@@ -139,7 +179,7 @@ app.patch("/user/:userId", async (req, res) => {
     });
     res.send("User updated successfully");
   } catch (error) {
-    res.status(400).send("Error: "+ error.message);
+    res.status(400).send("Error: " + error.message);
   }
 });
 
