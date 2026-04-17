@@ -66,6 +66,9 @@ const userSchema = mongoose.Schema(
   { timestamps: true }
 );
 
+// indexing: for easy looup
+userSchema.index({ firstName: 1 })
+
 userSchema.methods.getJWT = async function () {
   const user = this; // Always use normal function here DONT USE ARROW FUNCTION HERE
   const token = jwt.sign({ _id: user._id }, "DEV@Tinder$790", {
