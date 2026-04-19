@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema(
     firstName: {
       type: String,
       required: true,
-      minLength: 3,
+      minLength: 2,
       maxLength: 50,
     },
     lastName: {
@@ -63,11 +63,11 @@ const userSchema = mongoose.Schema(
       type: [String],
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // indexing: for easy looup
-userSchema.index({ firstName: 1 })
+userSchema.index({ firstName: 1 });
 
 userSchema.methods.getJWT = async function () {
   const user = this; // Always use normal function here DONT USE ARROW FUNCTION HERE
@@ -78,11 +78,14 @@ userSchema.methods.getJWT = async function () {
 };
 
 userSchema.methods.validatePassword = async function (passwordInputByUser) {
-    const user = this;
-    const passwordHash = user.password;
-    const isPasswordValid = await bcrypt.compare(passwordInputByUser, passwordHash);
-    return isPasswordValid;
-}
+  const user = this;
+  const passwordHash = user.password;
+  const isPasswordValid = await bcrypt.compare(
+    passwordInputByUser,
+    passwordHash,
+  );
+  return isPasswordValid;
+};
 
 // Creating a model (A models name starts with capital letter)
 // Think of a model as a class of which different instances will be there database.

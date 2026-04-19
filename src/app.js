@@ -4,6 +4,7 @@ const app = express(); // creating an instance of express.js application
 require("./config/database");
 const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 // Importing the routes
 const authRouter = require("./routes/auth");
@@ -11,6 +12,7 @@ const requestRouter = require("./routes/request");
 const profileRouter = require("./routes/profile");
 const userRouter = require("./routes/user");
 
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 // Writing like this(app.use()) makes it applicable to all the routes("/") for application which means for all the requests. We don't need to write it again for parsing anymore.
 app.use(express.json());
