@@ -41,8 +41,8 @@ authRouter.post("/signup", async (req, res) => {
     });
 
     // saving data to the database
-    await user.save();
-    res.send("User added successfully");
+    const data = await user.save();
+    res.json({ message: "User added successfully", data });
   } catch (err) {
     res.status(400).send("Error:" + err.message);
   }
@@ -87,10 +87,10 @@ authRouter.post("/login", async (req, res) => {
 authRouter.post("/logout", async (req, res) => {
   // Sometime we need to do some cleanus while logging out along with clearing the token
   res.cookie("token", null, {
-    expires: new Date(Date.now())
+    expires: new Date(Date.now()),
   });
   res.send("Logout Successful");
   // We can chain above methods: res.cookie().send();
-})
+});
 
 module.exports = authRouter;
