@@ -42,6 +42,10 @@ authRouter.post("/signup", async (req, res) => {
 
     // saving data to the database
     const data = await user.save();
+    const token = await data.getJWT();
+     res.cookie("token", token, {
+       expires: new Date(Date.now() + 8 * 3600000),
+     });
     res.json({ message: "User added successfully", data });
   } catch (err) {
     res.status(400).send("Error:" + err.message);
@@ -67,7 +71,7 @@ authRouter.post("/login", async (req, res) => {
       // Install jsonwebtoken package from npm library
 
       const token = await user.getJWT();
-      console.log(token);
+      // console.log(token);
 
       // Add the token to cookie then send cookie back to user
 
