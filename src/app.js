@@ -1,16 +1,20 @@
+require("dotenv").config();
 const express = require("express");
+const http = require("http");
 const app = express(); // creating an instance of express.js application
 // const { adminAuthuth, adminAuth } = require("./middleware/auth");
 require("./config/database");
 const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const initSocket = require("./utils/socket");
 
 // Importing the routes
 const authRouter = require("./routes/auth");
 const requestRouter = require("./routes/request");
 const profileRouter = require("./routes/profile");
 const userRouter = require("./routes/user");
+const chatRouter = require("./routes/chat");
 
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
@@ -24,6 +28,7 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", chatRouter);
 
 // // Profile
 // app.get("/profile", userAuth, async (req, res) => {
@@ -110,13 +115,13 @@ app.use("/", userRouter);
 //   }
 // });
 
+const server = http.createServer(app);
+initSocket(server);
+
 connectDB()
   .then(() => {
     console.log("Database connection successful");
-
-    // listen method accepts a port number and a callback function that executes only when server is running successfully on passed port number
-    // We should connect the database before starting application on a certain port that why we are passing here because when connectDB promise resolve and database is successfully connected then we start application.
-    app.listen(7777, () => {
+    server.listen(7777, () => {
       console.log("Server is successfully running on port 7777 ...");
     });
   })

@@ -71,7 +71,7 @@ userSchema.index({ firstName: 1 });
 
 userSchema.methods.getJWT = async function () {
   const user = this; // Always use normal function here DONT USE ARROW FUNCTION HERE
-  const token = jwt.sign({ _id: user._id }, "DEV@Tinder$790", {
+  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   }); // this token will expire in 1 day
   return token;

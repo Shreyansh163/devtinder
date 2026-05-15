@@ -1,4 +1,4 @@
-# DevTinder APIs
+# Pairly APIs
 
 An application can have n number of apis. Best practice to implement apis using express router to group similar path apis together that ensures better readabilit and cleaner code. It also helps in debugging.
 
