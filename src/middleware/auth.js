@@ -18,7 +18,7 @@ const userAuth = async (req, res, next) => {
     // Read the request from the req cookies
     const { token } = req.cookies;
     if (!token) {
-      res.status(401).send("Please Login!");
+      return res.status(401).send("Please Login!");
     }
     // Validate the token
     const decodedObj = await jwt.verify(token, process.env.JWT_SECRET);
@@ -32,7 +32,7 @@ const userAuth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    res.status(400).send("Error: " + error.message);
+    res.status(401).send("Error: " + error.message);
   }
 };
 
